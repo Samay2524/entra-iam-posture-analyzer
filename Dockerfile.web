@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+ARG VITE_API_URL
+ARG VITE_TENANT_ID
+ARG VITE_CLIENT_ID
+ARG VITE_GEMINI_STATUS
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_TENANT_ID=$VITE_TENANT_ID
+ENV VITE_CLIENT_ID=$VITE_CLIENT_ID
+ENV VITE_GEMINI_STATUS=$VITE_GEMINI_STATUS
+
+COPY web/package*.json ./
+RUN npm install
+
+COPY web ./
+RUN npm run build
+
+EXPOSE 8501
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "8501"]

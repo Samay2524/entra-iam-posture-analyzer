@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=sqlite:////app/data/entra_iam.db
+      - MSAL_CACHE_PATH=/app/data/msal_cache.bin
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3-flash}
+      - GEMINI_FALLBACK_MODEL=${GEMINI_FALLBACK_MODEL:-gemini-2.5-flash}
+    volumes:
+      - ./connectors_out:/app/connectors_out
+      - db_data:/app/data
+    ports:
+      - "8000:8000"
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_URL: http://localhost:8000
+        VITE_TENANT_ID: ${TENANT_ID}
+        VITE_CLIENT_ID: ${CLIENT_ID}
+        VITE_GEMINI_STATUS: Loaded
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_TENANT_ID=${TENANT_ID}
+      - VITE_CLIENT_ID=${CLIENT_ID}
+      - VITE_GEMINI_STATUS=Loaded
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  db_data:

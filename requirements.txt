@@ -1,0 +1,9 @@
+fastapi==0.115.5
+uvicorn==0.30.6
+sqlalchemy==2.0.35
+pydantic==2.9.2
+requests==2.32.3
+msal==1.30.0
+python-dotenv==1.0.1
+streamlit==1.39.0
+pandas==2.2.3
