@@ -8,6 +8,11 @@ This project is a local IAM posture analysis lab tool for Microsoft Entra ID ten
 - Produces task queues for access reviews and remediation.
 - Uses AI to accelerate human review and ticket drafting.
 
+## Why this is different
+- Deterministic rules + explainable findings (not a black box).
+- AI outputs structured reviewer packets (consistent, auditable).
+- Produces mock enterprise ticket artifacts for workflows.
+
 ## Architecture
 ```
                     +----------------------------+
@@ -38,6 +43,10 @@ docker compose up --build
 
 For a full step‑by‑step guide, see `SETUP.md`.
 
+## Screenshots
+Add 1–2 screenshots of the Dashboard + AI report view. This helps reviewers
+understand the product without running it.
+
 ## Local dev (optional)
 1) Create and activate a virtual environment:
 ```
@@ -61,6 +70,11 @@ npm run dev -- --host 0.0.0.0 --port 8501
 
 Backend runs at `http://localhost:8000`.
 
+## Repo layout
+- `api/` FastAPI backend (Graph ingest, rules, AI, exports)
+- `web/` React + Vite UI (current)
+- `ui/` Legacy Streamlit UI (deprecated; not used)
+
 ## Required env vars
 - `TENANT_ID`, `CLIENT_ID`, `CLIENT_SECRET` for Entra app-only auth.
 - `GEMINI_API_KEY` for AI summaries.
@@ -82,5 +96,17 @@ Grant admin consent after adding them.
 4) The AI summary and report are created automatically.
 5) Reports are saved to `connectors_out/iam_report_<id>.json`.
 
+## Roadmap
+- Conditional Access policy checks
+- PIM role assignments + activation windows
+- Export formats: PDF/CSV
+- Human approval workflows and audit trails
+
+## Sample output
+See `examples/iam_report_sample.json` for a sample report payload.
+
 ## Disclaimer
 This is a lab prototype. It does not make production changes. AI recommendations are suggestions only; humans make the final access decisions. No automated removals are performed in Entra.
+
+## License
+MIT (see `LICENSE`).

@@ -1,0 +1,36 @@
+{
+  "title": "Remediation for task 101",
+  "description": "Task type: ACCESS_REVIEW. Priority: P2.",
+  "acceptance_criteria": [
+    "Validate risk drivers",
+    "Document approval/revocation"
+  ],
+  "risk_statement": "IAM risks detected in Entra tenant.",
+  "identity_id": 123,
+  "finding_ids": [10, 11],
+  "generated_at": "2026-02-07T12:00:00Z",
+  "mocked": true,
+  "ai_summary": "Disabled user retains privileged role and group membership.",
+  "ai_recommendation": "REVOKE",
+  "ai_recommended_actions": [
+    {
+      "action": "Remove privileged role",
+      "why": "Disabled accounts should not keep elevated access.",
+      "evidence": "User is disabled and assigned Global Administrator."
+    },
+    {
+      "action": "Remove from privileged group",
+      "why": "Reduce risk by enforcing least privilege.",
+      "evidence": "User is member of a privileged group."
+    }
+  ],
+  "ai_ticket_draft": {
+    "title": "Remove privileged access for disabled user",
+    "description": "User is disabled but has privileged access.",
+    "acceptance_criteria": [
+      "Privileged role removed",
+      "Privileged group membership removed"
+    ],
+    "risk_statement": "Disabled accounts with privileged access increase breach risk."
+  }
+}
