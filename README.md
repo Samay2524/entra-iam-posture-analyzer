@@ -44,8 +44,7 @@ docker compose up --build
 For a full step‑by‑step guide, see `SETUP.md`.
 
 ## Screenshots
-Add 1–2 screenshots of the Dashboard + AI report view. This helps reviewers
-understand the product without running it.
+![Dashboard view](docs/screenshots/dashboard.png)
 
 ## Local dev (optional)
 1) Create and activate a virtual environment:

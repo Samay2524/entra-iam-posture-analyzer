@@ -372,13 +372,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="card p-6">
-        <div className="text-xl font-semibold">Overview</div>
-        <div className="text-sm text-muted mt-1">
-          All workflows are unified here for a single, simple view.
-        </div>
-      </div>
-
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-7 gap-3">
           <Metric title="Identities" value={summary.identities} subtitle="Total identities" />
@@ -395,8 +388,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,1.2fr] gap-3">
-        <div className="card p-4 space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,1.2fr] gap-3 lg:items-stretch">
+        <div className="card p-4 space-y-3 flex flex-col h-full">
           <div className="flex items-center justify-between">
             <div className="text-lg font-semibold">Recent tasks</div>
             <div className="text-xs text-muted">
@@ -463,7 +456,7 @@ export default function Dashboard() {
             </div>
           </details>
 
-          <div className="overflow-auto border border-border rounded-lg max-h-56">
+          <div className="overflow-auto border border-border rounded-lg flex-1 min-h-0">
             <table className="min-w-full text-sm">
               <thead className="bg-[#faf9f7] text-muted">
                 <tr>
@@ -477,7 +470,7 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {tasks.slice(0, 12).map((t) => (
+                {tasks.map((t) => (
                   <tr
                     key={t.id}
                     className="border-t border-border cursor-pointer hover:bg-white/70"
@@ -504,34 +497,99 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="card p-4 space-y-3">
-          <div className="text-lg font-semibold">Identity Review</div>
-          <div className="text-sm text-muted">
-            Select an identity to auto-generate its AI summary and report.
+        <div className="space-y-3">
+          <div className="card p-4 space-y-3">
+            <div className="text-lg font-semibold">Identity Review</div>
+            <div className="text-sm text-muted">
+              Select an identity to auto-generate its AI summary and report.
+            </div>
+            <select
+              className="border border-border rounded-lg px-3 py-2 w-full"
+              value={selectedId}
+              onChange={(e) => setSelectedId(e.target.value)}
+            >
+              <option value="">Choose an identity</option>
+              {identities.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.display_name} ({i.id})
+                </option>
+              ))}
+            </select>
+            {details ? (
+              <div className="border border-border rounded-lg p-3 text-sm">
+                <div className="font-medium">{details.display_name}</div>
+                <div className="text-xs text-muted">{details.upn || "No sign-in name"}</div>
+                <div className="mt-2 text-xs text-muted">
+                  Findings: {findingCount} • Roles: {roleCount}
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-muted">Select an identity to see details.</div>
+            )}
           </div>
-          <select
-            className="border border-border rounded-lg px-3 py-2 w-full"
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-          >
-            <option value="">Choose an identity</option>
-            {identities.map((i) => (
-              <option key={i.id} value={i.id}>
-                {i.display_name} ({i.id})
-              </option>
-            ))}
-          </select>
-          {details ? (
-            <div className="border border-border rounded-lg p-3 text-sm">
-              <div className="font-medium">{details.display_name}</div>
-              <div className="text-xs text-muted">{details.upn || "No sign-in name"}</div>
-              <div className="mt-2 text-xs text-muted">
-                Findings: {findingCount} • Roles: {roleCount}
+          <div className="card p-4">
+            <div className="text-lg font-semibold mb-3">Generated Reports</div>
+            <div className="text-xs text-muted mb-2">
+              Each report is created by AI and can be downloaded as a PDF.
+            </div>
+            <div className="mb-3">
+              <button className="btn-primary" onClick={downloadAllReportsPdf}>
+                Download All Reports (PDF)
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm max-h-64 overflow-auto">
+              {reportExports.slice(0, 6).map((report) => (
+                <details key={report.file} className="border border-border rounded-lg p-3">
+                  <summary className="cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{report.title || "IAM Report"}</div>
+                        <div className="text-xs text-muted">
+                          Recommendation: {report.ai_recommendation || "—"}
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted">{report.generated_at || "—"}</div>
+                    </div>
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    <div className="text-xs text-muted">Summary</div>
+                    <div>{shortText(report.ai_summary || report.description, 220)}</div>
+                  </div>
+                </details>
+              ))}
+              {!reportExports.length && (
+                <div className="text-sm text-muted">No reports yet.</div>
+              )}
+            </div>
+          </div>
+          <div className="card p-4">
+            <div className="text-lg font-semibold mb-3">Run Report Summary</div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="border border-border rounded-lg p-3">
+                <div className="text-xs text-muted">Identities</div>
+                <div className="text-lg font-semibold">{reportSummary?.identities ?? "—"}</div>
+              </div>
+              <div className="border border-border rounded-lg p-3">
+                <div className="text-xs text-muted">High/Critical</div>
+                <div className="text-lg font-semibold">{reportSummary?.high_risk_identities ?? "—"}</div>
+              </div>
+              <div className="border border-border rounded-lg p-3">
+                <div className="text-xs text-muted">Open Tasks</div>
+                <div className="text-lg font-semibold">{reportSummary?.open_tasks ?? "—"}</div>
+              </div>
+              <div className="border border-border rounded-lg p-3">
+                <div className="text-xs text-muted">P1 Tasks</div>
+                <div className="text-lg font-semibold">{reportSummary?.p1_tasks ?? "—"}</div>
               </div>
             </div>
-          ) : (
-            <div className="text-xs text-muted">Select an identity to see details.</div>
-          )}
+            {topFindings.length ? (
+              <div className="mt-3">
+                <BarList title="Top Findings" items={topFindings} />
+              </div>
+            ) : (
+              <div className="text-xs text-muted mt-3">No findings data yet.</div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -764,71 +822,6 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="text-sm text-muted">Generating ticket…</div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <div className="card p-4">
-              <div className="text-lg font-semibold mb-3">Run Report Summary</div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="border border-border rounded-lg p-3">
-                  <div className="text-xs text-muted">Identities</div>
-                  <div className="text-lg font-semibold">{reportSummary?.identities ?? "—"}</div>
-                </div>
-                <div className="border border-border rounded-lg p-3">
-                  <div className="text-xs text-muted">High/Critical</div>
-                  <div className="text-lg font-semibold">{reportSummary?.high_risk_identities ?? "—"}</div>
-                </div>
-                <div className="border border-border rounded-lg p-3">
-                  <div className="text-xs text-muted">Open Tasks</div>
-                  <div className="text-lg font-semibold">{reportSummary?.open_tasks ?? "—"}</div>
-                </div>
-                <div className="border border-border rounded-lg p-3">
-                  <div className="text-xs text-muted">P1 Tasks</div>
-                  <div className="text-lg font-semibold">{reportSummary?.p1_tasks ?? "—"}</div>
-                </div>
-              </div>
-              {topFindings.length ? (
-                <div className="mt-3">
-                  <BarList title="Top Findings" items={topFindings} />
-                </div>
-              ) : (
-                <div className="text-xs text-muted mt-3">No findings data yet.</div>
-              )}
-            </div>
-            <div className="card p-4">
-              <div className="text-lg font-semibold mb-3">Generated Reports</div>
-              <div className="text-xs text-muted mb-2">
-                Each report is created by AI and can be downloaded as a PDF.
-              </div>
-              <div className="mb-3">
-                <button className="btn-primary" onClick={downloadAllReportsPdf}>
-                  Download All Reports (PDF)
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm max-h-64 overflow-auto">
-                {reportExports.slice(0, 6).map((report) => (
-                  <details key={report.file} className="border border-border rounded-lg p-3">
-                    <summary className="cursor-pointer">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">{report.title || "IAM Report"}</div>
-                          <div className="text-xs text-muted">
-                            Recommendation: {report.ai_recommendation || "—"}
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted">{report.generated_at || "—"}</div>
-                      </div>
-                    </summary>
-                    <div className="mt-3 space-y-2">
-                      <div className="text-xs text-muted">Summary</div>
-                      <div>{shortText(report.ai_summary || report.description, 220)}</div>
-                    </div>
-                  </details>
-                ))}
-                {!reportExports.length && (
-                  <div className="text-sm text-muted">No reports yet.</div>
                 )}
               </div>
             </div>
